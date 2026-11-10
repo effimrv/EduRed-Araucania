@@ -266,3 +266,5 @@ th { color: var(--texto-suave); font-weight: 600; font-size: .8rem; text-transfo
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+[hidden] { display: none !important; }
