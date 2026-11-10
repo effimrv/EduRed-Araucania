@@ -43,12 +43,20 @@ test('RBAC: matriz por rol', () => {
 
 test('alcance de datos: cada rol ve solo lo que le corresponde', async () => {
   const almacen = await crearAlmacen();
+  const datos = await construirDatosDemo();
+  const estudiantes = datos.usuarios.filter((u) => u.rol === 'estudiante');
+  const ids = (lista) => lista.map((e) => e.id).sort();
   const nombres = (u) => estudiantesVisibles(u, almacen).map((e) => e.id).sort();
+  const urbanos = estudiantes.filter((e) => e.establecimientoId === 'est-urbano');
+  const delCurso = (cursos) => estudiantes.filter((e) => e.cursoIds.some((c) => cursos.includes(c)));
+  const rurales = estudiantes.filter((e) => e.establecimientoId === 'est-rural');
+
   assert.deepEqual(nombres(usuarioDe(almacen, 'usr-est-ana')), ['usr-est-ana']);
   assert.deepEqual(nombres(usuarioDe(almacen, 'usr-apoderada-ana')), ['usr-est-ana']);
-  assert.deepEqual(nombres(usuarioDe(almacen, 'usr-docente')), ['usr-est-ana', 'usr-est-benjamin', 'usr-est-camila']);
-  assert.deepEqual(nombres(usuarioDe(almacen, 'usr-directiva')), ['usr-est-ana', 'usr-est-benjamin', 'usr-est-camila']);
-  assert.deepEqual(nombres(usuarioDe(almacen, 'usr-docente-rural')), ['usr-est-valentina']);
+  assert.deepEqual(nombres(usuarioDe(almacen, 'usr-docente')), ids(delCurso(['cur-4a', 'cur-4b'])));
+  assert.deepEqual(nombres(usuarioDe(almacen, 'usr-directiva')), ids(urbanos));
+  assert.deepEqual(nombres(usuarioDe(almacen, 'usr-docente-rural')), ids(rurales));
+  assert.ok(nombres(usuarioDe(almacen, 'usr-docente')).length > 50, 'un docente tiene muchos estudiantes a cargo');
 });
 
 test('autenticación: contraseña correcta, incorrecta y correo desconocido', async () => {
@@ -159,7 +167,9 @@ test('offline: las escrituras se encolan y se sincronizan al volver la red', asy
 
 test('datos demo: todas las cuentas son válidas y el repositorio persiste', async () => {
   const datos = await construirDatosDemo();
-  assert.equal(datos.usuarios.length, 9);
+  const estudiantes = datos.usuarios.filter((u) => u.rol === 'estudiante');
+  assert.ok(estudiantes.length >= 60, 'hay un curso completo de estudiantes');
+  assert.equal(datos.usuarios.filter((u) => u.rol !== "estudiante").length, 5);
   const repo = new Repositorio(new MemoryStorage());
   repo.reemplazarTodo('recursos', datos.recursos);
   assert.equal(repo.todos('recursos').length, datos.recursos.length);

@@ -12,7 +12,7 @@ import {
 const SESION = 'edured:sesion';
 const SIMULAR_OFFLINE = 'edured:simularOffline';
 const VERSION_DATOS = 'edured:versionDatos';
-const VERSION_ACTUAL = '2';
+const VERSION_ACTUAL = '3';
 const app = document.getElementById('app');
 
 // ---------- Almacenamiento y estado ----------

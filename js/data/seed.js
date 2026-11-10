@@ -20,6 +20,65 @@ async function usuario(id, datos) {
   return { id, activo: true, salt, passwordHash, ...datos };
 }
 
+const NOMBRES = ['Sofía', 'Matías', 'Isidora', 'Vicente', 'Florencia', 'Joaquín', 'Antonella', 'Benjamín', 'Catalina', 'Martín', 'Javiera', 'Tomás', 'Trinidad', 'Agustín', 'Renata', 'Lucas', 'Emilia', 'Felipe', 'Constanza', 'Gabriel', 'Francisca', 'Ignacio', 'Amanda', 'Maximiliano'];
+const APELLIDOS = ['Muñoz', 'Rojas', 'Díaz', 'Pérez', 'Soto', 'Contreras', 'Silva', 'Martínez', 'Sepúlveda', 'Morales', 'Vergara', 'Fuentes', 'Hernández', 'Torres', 'Araya', 'Flores', 'Espinoza', 'Valenzuela', 'Castillo', 'Reyes', 'Millaleo', 'Painemal', 'Huenchul', 'Caniupán'];
+const SIN_TILDES = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+// Notas deterministas entre 2,5 y 6,5 (sin azar, para que las pruebas sean estables)
+function notaDe(i, asignatura) {
+  const valor = 4.0 + (((i + 1) * (asignatura + 3) * 7) % 31) / 10 - 1.5;
+  return Math.round(Math.min(7, Math.max(1, valor)) * 10) / 10;
+}
+
+// Crea un curso completo: estudiantes, notas por asignatura, tutorías, inscripciones y asistencia.
+async function generarCursos() {
+  const grupos = [
+    { curso: 'cur-4a', establecimiento: 'est-urbano', cantidad: 28, prefijo: 'a' },
+    { curso: 'cur-4b', establecimiento: 'est-urbano', cantidad: 26, prefijo: 'b' },
+    { curso: 'cur-4r', establecimiento: 'est-rural', cantidad: 14, prefijo: 'r' },
+  ];
+  const asignaturas = ['asg-len', 'asg-mat', 'asg-cie'];
+  const out = { usuarios: [], resultados: [], inscripciones: [], asistencias: [], tutorias: [] };
+  let n = 0;
+  for (const g of grupos) {
+    const ids = [];
+    for (let k = 0; k < g.cantidad; k++) {
+      n += 1;
+      const nombre = `${NOMBRES[(n * 5) % NOMBRES.length]} ${APELLIDOS[n % APELLIDOS.length]} ${APELLIDOS[(n * 7 + 3) % APELLIDOS.length]}`;
+      const id = `usr-est-${g.prefijo}${String(k + 1).padStart(2, '0')}`;
+      ids.push(id);
+      out.usuarios.push(await usuario(id, {
+        nombre, correo: `${SIN_TILDES(nombre.split(' ')[0])}.${g.prefijo}${k + 1}@edured.cl`,
+        rol: 'estudiante', establecimientoId: g.establecimiento, cursoIds: [g.curso],
+      }));
+      asignaturas.forEach((asg, a) => out.resultados.push({
+        id: `res-${id}-${a}`, estudianteId: id, asignaturaId: asg, periodo: '2026-1', nota: notaDe(n, a),
+      }));
+    }
+    // Dos tutorías por curso (una por asignatura de apoyo), con inscripción de la mitad del curso
+    const tutorias = [
+      { asg: 'asg-len', titulo: 'Refuerzo de comprensión lectora', dias: 4, hora: '15:00' },
+      { asg: 'asg-mat', titulo: 'Resolución de problemas', dias: 6, hora: '14:00' },
+    ];
+    const docente = g.establecimiento === 'est-rural' ? 'usr-docente-rural' : 'usr-docente';
+    tutorias.forEach((t, j) => {
+      const tid = `tut-${g.prefijo}${j + 1}`;
+      out.tutorias.push({
+        id: tid, titulo: t.titulo, asignaturaId: t.asg, docenteId: docente, cursoId: g.curso,
+        inicio: enDias(t.dias, t.hora), cupos: 30, establecimientoId: g.establecimiento,
+      });
+      ids.filter((_, k) => (k + j) % 2 === 0).forEach((est, k) => {
+        out.inscripciones.push({ id: `ins-${tid}-${k}`, tutoriaId: tid, estudianteId: est });
+        out.asistencias.push({
+          id: `asi-${tid}-${k}`, tutoriaId: tid, estudianteId: est,
+          presente: (k % 5) !== 0, fecha: enDias(-7 + j),
+        });
+      });
+    });
+  }
+  return out;
+}
+
 export async function construirDatosDemo() {
   const establecimientos = [
     { id: 'est-urbano', nombre: 'Escuela Los Aromos', zona: 'urbana', comuna: 'Temuco' },
@@ -119,6 +178,13 @@ export async function construirDatosDemo() {
     { id: 'reg-2', nombre: 'Matemática bajo 4,0', asignaturaId: 'asg-mat', umbral: 4.0, recursoId: 'rec-3', aprobadaPor: 'usr-docente', activa: true },
     { id: 'reg-3', nombre: 'Ciencias bajo 4,0 (sin aprobar)', asignaturaId: 'asg-cie', umbral: 4.0, recursoId: 'rec-4', aprobadaPor: null, activa: true },
   ];
+
+  const cursoCompleto = await generarCursos();
+  usuarios.push(...cursoCompleto.usuarios);
+  resultados.push(...cursoCompleto.resultados);
+  inscripciones.push(...cursoCompleto.inscripciones);
+  asistencias.push(...cursoCompleto.asistencias);
+  tutorias.push(...cursoCompleto.tutorias);
 
   return {
     establecimientos, cursos, asignaturas, usuarios, recursos, tutorias,
