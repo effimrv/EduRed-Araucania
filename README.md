@@ -47,11 +47,10 @@ js/domain/      models · servicios · rules · reports
 js/ui/          vistas · componentes
 js/data/        seed (datos de demostración)
 tests/          dominio.test.js
-docs/           Arquitectura en 4+1 y modelo de datos (diagramas Mermaid)
 scripts/        servidor local
 ```
 
-La documentación de arquitectura está en [docs/README.md](docs/README.md).
+La documentación de arquitectura (vistas 4+1, diagramas y modelo de datos) y los documentos de gestión se mantienen fuera del repositorio, en la carpeta local del proyecto.
 
 ## Alcance y limitaciones
 
