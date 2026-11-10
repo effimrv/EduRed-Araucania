@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dfe9ff"/>
+      <stop offset="1" stop-color="#f1e6ff"/>
+    </linearGradient>
+    <radialGradient id="b1" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7b5cff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#7b5cff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b2" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#17b8a6" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#17b8a6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="b3" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#e255b8" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#e255b8" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="puntos" width="32" height="32" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#2d6cdf" fill-opacity="0.18"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g1)"/>
+  <rect width="1600" height="1000" fill="url(#puntos)"/>
+  <circle cx="260" cy="220" r="420" fill="url(#b1)"/>
+  <circle cx="1400" cy="820" r="460" fill="url(#b2)"/>
+  <circle cx="1250" cy="120" r="300" fill="url(#b3)"/>
+  <path d="M0 760 C 300 680, 520 840, 820 780 S 1300 700, 1600 800 L1600 1000 L0 1000 Z" fill="#ffffff" fill-opacity="0.35"/>
+</svg>

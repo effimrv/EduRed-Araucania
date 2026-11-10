@@ -502,3 +502,13 @@ article.tarjeta:hover, .tarjeta.kpi:hover {
 .login-caja .tarjeta { box-shadow: var(--sombra); background: var(--surface); backdrop-filter: none; }
 .login .cuenta { display: none; }
 @media (max-width: 520px) { .demo-grid { grid-template-columns: 1fr; } }
+
+/* Fondo de la pantalla de inicio de sesión */
+.login {
+  background: #eef3fb url("../assets/fondo-login.svg") center / cover no-repeat fixed;
+}
+.login::before, .login::after { display: none; }
+.login-caja .tarjeta { background: rgba(255,255,255,.92); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .login { background: #0f1420 url("../assets/fondo-login.svg") center / cover no-repeat fixed; }
+}
