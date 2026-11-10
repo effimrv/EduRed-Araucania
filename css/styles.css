@@ -458,3 +458,47 @@ article.tarjeta:hover, .tarjeta.kpi:hover {
 @media (prefers-reduced-motion: reduce) {
   .login::before, .login::after, #vista > * { animation: none !important; }
 }
+
+/* ================= Login ordenado ================= */
+.login { background: var(--bg); }
+.login::before, .login::after { opacity: .25; }
+.login-caja { gap: 40px; }
+.login-marca h1 {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  margin: 1rem 0 .4rem;
+}
+.login-bajada { font-size: 1.05rem; color: var(--texto-suave); margin-bottom: 1.25rem; }
+.login-lista {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: .6rem;
+}
+.login-lista li {
+  position: relative; padding-left: 1.4rem; color: var(--texto); font-size: .95rem;
+}
+.login-lista li::before {
+  content: ""; position: absolute; left: 0; top: .5em;
+  width: 8px; height: 8px; border-radius: 50%; background: var(--grad);
+}
+.login-panel { display: grid; gap: 16px; }
+.login-form h2, .login-demo h3 { margin-bottom: .75rem; }
+.login-form label { margin-bottom: 1rem; }
+.login-error {
+  color: var(--peligro); font-size: .9rem; margin: 0 0 .75rem;
+}
+.login-error[hidden] { display: none; }
+.login-demo { padding: 1rem 1.1rem; }
+.login-demo h3 { font-size: .95rem; margin-bottom: .2rem; }
+.login-demo p { margin-bottom: .75rem; }
+.demo-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+}
+.demo-item {
+  text-align: left; padding: .6rem .75rem; border-radius: 10px;
+  display: grid; gap: 0;
+}
+.demo-item strong { font-size: .92rem; }
+.demo-item small { color: var(--texto-suave); font-size: .8rem; }
+.demo-item:hover { border-color: var(--acento-2); }
+.login-caja .tarjeta { box-shadow: var(--sombra); background: var(--surface); backdrop-filter: none; }
+.login .cuenta { display: none; }
+@media (max-width: 520px) { .demo-grid { grid-template-columns: 1fr; } }

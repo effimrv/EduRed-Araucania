@@ -41,11 +41,11 @@ function ctx() {
 
 function vistaLogin() {
   const cuentas = [
-    ['docente@edured.cl', 'Docente', 'Marcela Painemal · aprueba recursos y registra asistencia'],
-    ['docente.rural@edured.cl', 'Docente rural', 'Rodrigo Millaleo · escuela rural'],
-    ['ana@edured.cl', 'Estudiante', 'Ana Quilodrán · 4° A'],
-    ['apoderada@edured.cl', 'Apoderado', 'Patricia Quilodrán · apoderada de Ana'],
-    ['directiva@edured.cl', 'Directivo', 'Carolina Soto · establecimiento urbano'],
+    ["docente@edured.cl", "Docente", "Marcela Painemal"],
+    ["docente.rural@edured.cl", "Docente rural", "Rodrigo Millaleo"],
+    ["ana@edured.cl", "Estudiante", "Ana Quilodrán"],
+    ["apoderada@edured.cl", "Apoderado", "Patricia Quilodrán"],
+    ["directiva@edured.cl", "Directivo", "Carolina Soto"],
   ];
   app.innerHTML = `
     <section class="login">
@@ -53,24 +53,33 @@ function vistaLogin() {
         <div class="login-marca">
           <div class="logo"><img src="assets/logo.png" alt="Logo de EduRed"></div>
           <h1>EduRed Araucanía</h1>
-          <p class="suave">Plataforma de apoyo educativo para escuelas públicas del SLEP Araucanía. Funciona aunque no haya internet.</p>
-          <p class="suave">Cuentas de demostración con la contraseña <code>${esc(PASSWORD_DEMO)}</code>.</p>
+          <p class="login-bajada">Apoyo educativo para escuelas públicas del SLEP Araucanía.</p>
+          <ul class="login-lista">
+            <li>Recursos, tutorías y seguimiento en un mismo lugar</li>
+            <li>Cada rol ve solo lo que le corresponde</li>
+            <li>Sigue funcionando cuando no hay internet</li>
+          </ul>
         </div>
-        <div class="tarjeta">
-          <h2>Ingresar</h2>
-          <div class="chips"><span class="chip">📱 Funciona sin internet</span><span class="chip">🔐 Acceso por rol</span><span class="chip">📚 5 módulos</span></div>
-          <form data-form="login">
-            <label>Correo<input name="correo" type="email" autocomplete="username" required></label>
-            <label>Contraseña<input name="password" type="password" autocomplete="current-password" required></label>
-            <p id="error-login" class="badge peligro" hidden></p>
-            <button class="primario" type="submit" style="width:100%">Entrar</button>
-          </form>
-          <div class="cuentas" aria-label="Cuentas de demostración">
-            ${cuentas.map(([correo, rol, detalle]) => `
-              <button class="cuenta" data-action="cuentaDemo" data-correo="${esc(correo)}">
-                <span><strong>${esc(rol)}</strong><small>${esc(detalle)}</small></span>
-                <span class="flecha" aria-hidden="true">→</span>
-              </button>`).join('')}
+        <div class="login-panel">
+          <div class="tarjeta login-form">
+            <h2>Ingresar</h2>
+            <form data-form="login">
+              <label>Correo<input name="correo" type="email" autocomplete="username" required></label>
+              <label>Contraseña<input name="password" type="password" autocomplete="current-password" required></label>
+              <p id="error-login" class="login-error" hidden></p>
+              <button class="primario" type="submit" style="width:100%">Entrar</button>
+            </form>
+          </div>
+          <div class="tarjeta login-demo">
+            <h3>Cuentas de demostración</h3>
+            <p class="suave">Contraseña para todas: <code>${esc(PASSWORD_DEMO)}</code></p>
+            <div class="demo-grid">
+              ${cuentas.map(([correo, rol, nombre]) => `
+                <button class="demo-item" data-action="cuentaDemo" data-correo="${esc(correo)}">
+                  <strong>${esc(rol)}</strong>
+                  <small>${esc(nombre)}</small>
+                </button>`).join("")}
+            </div>
           </div>
         </div>
       </div>
