@@ -26,7 +26,7 @@ const SIN_TILDES = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toL
 
 // Notas deterministas entre 2,5 y 6,5 (sin azar, para que las pruebas sean estables)
 function notaDe(i, asignatura) {
-  const valor = 4.0 + (((i + 1) * (asignatura + 3) * 7) % 31) / 10 - 1.5;
+  const valor = 5.0 + (((i + 1) * (asignatura + 3) * 7) % 31) / 10 - 1.5;
   return Math.round(Math.min(7, Math.max(1, valor)) * 10) / 10;
 }
 
@@ -44,7 +44,8 @@ async function generarCursos() {
     const ids = [];
     for (let k = 0; k < g.cantidad; k++) {
       n += 1;
-      const nombre = `${NOMBRES[(n * 5) % NOMBRES.length]} ${APELLIDOS[n % APELLIDOS.length]} ${APELLIDOS[(n * 7 + 3) % APELLIDOS.length]}`;
+      const k = n - 1; // combinación única de nombre y primer apellido
+      const nombre = `${NOMBRES[k % NOMBRES.length]} ${APELLIDOS[Math.floor(k / NOMBRES.length) % APELLIDOS.length]} ${APELLIDOS[(k * 5 + 1) % APELLIDOS.length]}`;
       const id = `usr-est-${g.prefijo}${String(k + 1).padStart(2, '0')}`;
       ids.push(id);
       out.usuarios.push(await usuario(id, {
