@@ -524,3 +524,5 @@ article.tarjeta:hover, .tarjeta.kpi:hover {
 .login-marca h1 { color: transparent; }
 .login .demo-item strong { color: #1d2433; }
 .login .demo-item small { color: #5b6478; }
+.login .demo-item { background: #ffffff; border-color: #e2e7f0; color: #1d2433; }
+.login .demo-item:hover { background: #f5f7fb; }
