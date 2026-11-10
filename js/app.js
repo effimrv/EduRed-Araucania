@@ -11,6 +11,8 @@ import {
 
 const SESION = 'edured:sesion';
 const SIMULAR_OFFLINE = 'edured:simularOffline';
+const VERSION_DATOS = 'edured:versionDatos';
+const VERSION_ACTUAL = '2';
 const app = document.getElementById('app');
 
 // ---------- Almacenamiento y estado ----------
@@ -321,8 +323,10 @@ window.addEventListener('online', () => {
 window.addEventListener('offline', renderRuta);
 
 async function arrancar() {
-  if (!almacen.todos('usuarios').length) {
+  // Si cambian los datos de demostración, se recargan una vez por versión.
+  if (!almacen.todos('usuarios').length || storage.getItem(VERSION_DATOS) !== VERSION_ACTUAL) {
     await cargarDemo(almacen);
+    storage.setItem(VERSION_DATOS, VERSION_ACTUAL);
   }
   estado.usuario = sesionGuardada();
   renderRuta();

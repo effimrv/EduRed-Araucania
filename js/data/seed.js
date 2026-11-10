@@ -80,11 +80,13 @@ export async function construirDatosDemo() {
     { id: 'rec-1', titulo: 'Guía de comprensión lectora: el cuento corto', tipo: 'guia', nivel: '4° básico', asignaturaId: 'asg-len', creadoPor: 'usr-docente', aprobadoPor: 'usr-docente', estado: 'aprobado', tamanoKb: 180 },
     { id: 'rec-2', titulo: 'Video: fracciones con material concreto', tipo: 'video', nivel: '4° básico', asignaturaId: 'asg-mat', creadoPor: 'usr-docente', aprobadoPor: 'usr-docente', estado: 'aprobado', tamanoKb: 2400 },
     { id: 'rec-3', titulo: 'Ejercicios de multiplicación (nivel 1)', tipo: 'ejercicio', nivel: '4° básico', asignaturaId: 'asg-mat', creadoPor: 'usr-docente', aprobadoPor: 'usr-docente', estado: 'aprobado', tamanoKb: 95 },
+    { id: 'rec-5', titulo: 'Lectura: el ciclo de vida de la mariposa', tipo: 'guia', nivel: '4° básico', asignaturaId: 'asg-cie', creadoPor: 'usr-docente-rural', aprobadoPor: 'usr-docente', estado: 'aprobado', tamanoKb: 210 },
     { id: 'rec-4', titulo: 'Ciclo del agua: guía ilustrada', tipo: 'guia', nivel: '4° básico', asignaturaId: 'asg-cie', creadoPor: 'usr-docente-rural', aprobadoPor: null, estado: 'pendiente', tamanoKb: 320 },
   ];
 
   const tutorias = [
     { id: 'tut-1', titulo: 'Refuerzo de lectura', asignaturaId: 'asg-len', docenteId: 'usr-docente', cursoId: 'cur-4a', inicio: enDias(2), cupos: 10, establecimientoId: 'est-urbano' },
+    { id: 'tut-3', titulo: 'Ciencias: el agua en la naturaleza', asignaturaId: 'asg-cie', docenteId: 'usr-docente-rural', cursoId: 'cur-4r', inicio: enDias(5, '11:00'), cupos: 12, establecimientoId: 'est-rural' },
     { id: 'tut-2', titulo: 'Multiplicación en grupo', asignaturaId: 'asg-mat', docenteId: 'usr-docente-rural', cursoId: 'cur-4r', inicio: enDias(3, '10:00'), cupos: 8, establecimientoId: 'est-rural' },
   ];
 
@@ -107,6 +109,9 @@ export async function construirDatosDemo() {
     { id: 'res-4', estudianteId: 'usr-est-benjamin', asignaturaId: 'asg-mat', periodo: '2026-1', nota: 3.4 },
     { id: 'res-5', estudianteId: 'usr-est-camila', asignaturaId: 'asg-len', periodo: '2026-1', nota: 6.1 },
     { id: 'res-6', estudianteId: 'usr-est-valentina', asignaturaId: 'asg-mat', periodo: '2026-1', nota: 3.9 },
+    { id: 'res-7', estudianteId: 'usr-est-camila', asignaturaId: 'asg-mat', periodo: '2026-1', nota: 5.5 },
+    { id: 'res-8', estudianteId: 'usr-est-camila', asignaturaId: 'asg-cie', periodo: '2026-1', nota: 5.0 },
+    { id: 'res-9', estudianteId: 'usr-est-valentina', asignaturaId: 'asg-cie', periodo: '2026-1', nota: 3.8 },
   ];
 
   const reglas = [

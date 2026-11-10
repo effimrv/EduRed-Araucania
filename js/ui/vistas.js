@@ -46,64 +46,231 @@ export function alternarOffline(id) {
 
 // ---------- Inicio ----------
 
-export function vistaInicio(ctx) {
-  const { usuario, almacen } = ctx;
-  const visibles = estudiantesVisibles(usuario, almacen);
-  const recursosAprobados = almacen.filtrar('recursos', (r) => r.estado === 'aprobado').length;
-  const pendientes = almacen.filtrar('recursos', (r) => r.estado === 'pendiente').length;
-  const sugeridas = almacen.filtrar(
-    'recomendaciones',
-    (r) => r.estado === 'sugerida' && visibles.some((e) => e.id === r.estudianteId),
-  ).length;
-  const notas = almacen.todos('resultados').filter((r) => visibles.some((e) => e.id === r.estudianteId));
-  const promedio = notas.length ? (notas.reduce((a, r) => a + r.nota, 0) / notas.length).toFixed(1).replace('.', ',') : '—';
+const LIMITE_RIESGO = 4.0;
 
-  const proximas = almacen
-    .todos('tutorias')
+function notasDe(almacen, estudianteId) {
+  const asignaturas = new Map(almacen.todos('asignaturas').map((a) => [a.id, a.nombre]));
+  return [...ultimasNotas(almacen.todos('resultados'), estudianteId).values()]
+    .map((r) => ({ asignatura: asignaturas.get(r.asignaturaId) ?? '—', nota: r.nota, periodo: r.periodo }))
+    .sort((a, b) => a.asignatura.localeCompare(b.asignatura));
+}
+
+function promedioDe(notas) {
+  if (notas.length === 0) return null;
+  return notas.reduce((acc, n) => acc + n.nota, 0) / notas.length;
+}
+
+function asistenciaDe(almacen, estudianteId) {
+  const registros = almacen.filtrar('asistencias', (a) => a.estudianteId === estudianteId);
+  if (registros.length === 0) return null;
+  return Math.round((registros.filter((a) => a.presente).length / registros.length) * 100);
+}
+
+function formatoNota(n) {
+  return n === null ? '—' : n.toFixed(1).replace('.', ',');
+}
+
+function actividadReciente(almacen, usuario, visibles, limite = 6) {
+  const ids = new Set(visibles.map((e) => e.id));
+  const items = [];
+  almacen.todos('recursos').forEach((r) => {
+    if (usuario.rol === 'estudiante' || usuario.rol === 'apoderado') {
+      if (r.estado !== 'aprobado') return;
+    }
+    items.push({ fecha: r.creadoEn, texto: `Recurso "${r.titulo}" · ${r.estado}` });
+  });
+  almacen.todos('tutorias').forEach((t) => items.push({ fecha: t.creadoEn, texto: `Tutoría "${t.titulo}" programada` }));
+  almacen.todos('recomendaciones')
+    .filter((r) => ids.has(r.estudianteId))
+    .forEach((r) => items.push({ fecha: r.creadoEn, texto: `Recomendación para ${nombreDe(almacen, r.estudianteId)}` }));
+  almacen.todos('asistencias')
+    .filter((a) => ids.has(a.estudianteId))
+    .forEach((a) => items.push({ fecha: a.fecha, texto: `Asistencia de ${nombreDe(almacen, a.estudianteId)}: ${a.presente ? 'presente' : 'ausente'}` }));
+  return items.sort((a, b) => (a.fecha < b.fecha ? 1 : -1)).slice(0, limite);
+}
+
+function listaActividad(items) {
+  if (items.length === 0) return vacio('Todavía no hay actividad para mostrar.');
+  return `<ul class="lista-actividad">${items.map((i) => `
+    <li><span class="punto-act"></span><div><div>${esc(i.texto)}</div><small class="suave">${esc(formatearFecha(i.fecha))}</small></div></li>`).join('')}</ul>`;
+}
+
+function proximasTutorias(almacen, usuario, limite = 3) {
+  return almacen.todos('tutorias')
     .filter((t) => (usuario.rol === 'estudiante' ? usuario.cursoIds.includes(t.cursoId) : true))
     .sort((a, b) => a.inicio.localeCompare(b.inicio))
-    .slice(0, 3);
+    .slice(0, limite);
+}
 
-  const bienvenida = {
-    estudiante: 'Revisa tus recursos, tutorías y recomendaciones.',
-    apoderado: 'Aquí ves el avance de tu hijo o hija.',
-    docente: 'Aprueba recursos, organiza tutorías y registra asistencia.',
-    directivo: 'Visión general del establecimiento y de los informes.',
+function bloqueTutorias(almacen, usuario) {
+  const lista = proximasTutorias(almacen, usuario);
+  return lista.length
+    ? lista.map((t) => `
+        <div class="fila-simple">
+          <div><strong>${esc(t.titulo)}</strong>
+          <div class="suave">${esc(asignaturaDe(almacen, t.asignaturaId))} · ${esc(formatearFecha(t.inicio))}</div></div>
+        </div>`).join('')
+    : vacio('No hay tutorías programadas.');
+}
+
+function filasNotas(notas) {
+  if (notas.length === 0) return vacio('Todavía no hay notas registradas.');
+  return notas.map((n) => `
+    <div class="fila-simple">
+      <span>${esc(n.asignatura)} <small class="suave">periodo ${esc(n.periodo)}</small></span>
+      <span class="badge ${n.nota < LIMITE_RIESGO ? 'peligro' : 'ok'}">${formatoNota(n.nota)}</span>
+    </div>`).join('');
+}
+
+function encabezadoInicio(usuario, almacen) {
+  const saludo = usuario.nombre.split(' ')[0];
+  const frase = {
+    estudiante: 'Revisa tu avance, tus próximas tutorías y lo que te recomiendan.',
+    apoderado: 'Aquí ves el avance de tu hijo o hija, con notas, asistencia y recomendaciones.',
+    docente: 'Aprueba recursos, organiza tutorías y revisa qué estudiantes necesitan apoyo.',
+    directivo: 'Visión general del establecimiento: rendimiento, asistencia y estudiantes en riesgo.',
   }[usuario.rol];
-
+  const establecimiento = almacen.buscar('establecimientos', usuario.establecimientoId)?.nombre ?? '—';
   return `
     <section class="hero">
-      <h1>Hola, ${esc(usuario.nombre.split(' ')[0])}</h1>
-      <p>${esc(bienvenida)}</p>
+      <h1>Hola, ${esc(saludo)}</h1>
+      <p>${esc(frase)}</p>
       <div class="chips">
-        ${badge(usuario.rol, '')}
-        ${badge(almacen.buscar('establecimientos', usuario.establecimientoId)?.nombre ?? '—', '')}
-      </div>
-    </section>
-    <section class="grid kpis" aria-label="Indicadores">
-      ${kpi('Recursos aprobados', recursosAprobados)}
-      ${usuario.rol === 'docente' ? kpi('Pendientes de aprobar', pendientes) : ''}
-      ${kpi('Estudiantes a cargo', visibles.length)}
-      ${kpi('Promedio general', promedio)}
-      ${kpi('Recomendaciones sugeridas', sugeridas)}
-    </section>
-    <section class="grid dos" style="margin-top:var(--gutter)">
-      <div class="tarjeta">
-        <h2>Próximas tutorías</h2>
-        ${proximas.length
-          ? proximas.map((t) => `
-              <div style="padding:.6rem 0;border-bottom:1px solid var(--borde)">
-                <strong>${esc(t.titulo)}</strong>
-                <div class="suave">${esc(asignaturaDe(almacen, t.asignaturaId))} · ${esc(formatearFecha(t.inicio))}</div>
-              </div>`).join('')
-          : vacio('No hay tutorías programadas.')}
-      </div>
-      <div class="tarjeta">
-        <h2>Tu alcance</h2>
-        <p>Tu rol es <strong>${esc(usuario.rol)}</strong>. Solo ves la información que corresponde a tu rol (control de acceso por rol).</p>
-        <div class="acciones">${badge(`Establecimiento: ${almacen.buscar('establecimientos', usuario.establecimientoId)?.nombre ?? '—'}`, 'primario')}</div>
+        ${badge(etiquetaRol(usuario.rol), '')}
+        ${badge(establecimiento, '')}
       </div>
     </section>`;
+}
+
+function etiquetaRol(rol) {
+  return { estudiante: 'Estudiante', apoderado: 'Apoderado', docente: 'Docente', directivo: 'Equipo directivo' }[rol] ?? rol;
+}
+
+function inicioEstudiante(ctx) {
+  const { usuario, almacen } = ctx;
+  const notas = notasDe(almacen, usuario.id);
+  const prom = promedioDe(notas);
+  const asist = asistenciaDe(almacen, usuario.id);
+  const recs = almacen.filtrar('recomendaciones', (r) => r.estudianteId === usuario.id && r.estado === 'sugerida');
+  const recursos = almacen.todos('recursos');
+  return `
+    ${encabezadoInicio(usuario, almacen)}
+    <section class="grid kpis">
+      ${kpi('Promedio', formatoNota(prom))}
+      ${kpi('Asistencia', asist === null ? '—' : asist + '%')}
+      ${kpi('Recomendaciones', recs.length)}
+      ${kpi('Recursos disponibles', recursos.filter((r) => r.estado === 'aprobado').length)}
+    </section>
+    <section class="grid dos" style="margin-top:var(--gutter)">
+      <div class="tarjeta"><h2>Mis notas</h2>${filasNotas(notas)}</div>
+      <div class="tarjeta"><h2>Recomendado para ti</h2>${recs.length
+        ? recs.map((r) => `<div class="fila-simple"><span>${esc(recursos.find((x) => x.id === r.recursoId)?.titulo ?? 'Recurso')}</span><span class="badge alerta">sugerida</span></div>`).join('')
+        : vacio('No tienes recomendaciones por ahora. ¡Buen trabajo!')}</div>
+      <div class="tarjeta"><h2>Próximas tutorías</h2>${bloqueTutorias(almacen, usuario)}</div>
+      <div class="tarjeta"><h2>Actividad reciente</h2>${listaActividad(actividadReciente(almacen, usuario, [usuario]))}</div>
+    </section>`;
+}
+
+function inicioApoderado(ctx) {
+  const { usuario, almacen } = ctx;
+  const hijos = estudiantesVisibles(usuario, almacen);
+  const tarjetas = hijos.map((h) => {
+    const notas = notasDe(almacen, h.id);
+    const prom = promedioDe(notas);
+    const asist = asistenciaDe(almacen, h.id);
+    return `
+      <div class="tarjeta">
+        <h2>${esc(h.nombre)}</h2>
+        <p class="suave">${esc(cursoDe(almacen, h))}</p>
+        <div class="grid kpis" style="margin:.75rem 0">
+          ${kpi('Promedio', formatoNota(prom))}
+          ${kpi('Asistencia', asist === null ? '—' : asist + '%')}
+        </div>
+        <h3>Notas</h3>${filasNotas(notas)}
+      </div>`;
+  }).join('');
+  return `
+    ${encabezadoInicio(usuario, almacen)}
+    <section class="grid dos">${tarjetas || vacio('No hay estudiantes asociados a tu cuenta.')}</section>
+    <section class="grid dos" style="margin-top:var(--gutter)">
+      <div class="tarjeta"><h2>Próximas tutorías</h2>${bloqueTutorias(almacen, usuario)}</div>
+      <div class="tarjeta"><h2>Actividad reciente</h2>${listaActividad(actividadReciente(almacen, usuario, hijos))}</div>
+    </section>`;
+}
+
+function inicioDocente(ctx) {
+  const { usuario, almacen } = ctx;
+  const visibles = estudiantesVisibles(usuario, almacen);
+  const pendientes = almacen.filtrar('recursos', (r) => r.estado === 'pendiente' && r.creadoPor !== usuario.id);
+  const enRiesgo = visibles
+    .map((e) => ({ e, prom: promedioDe(notasDe(almacen, e.id)) }))
+    .filter((x) => x.prom !== null && x.prom < LIMITE_RIESGO);
+  const misTutorias = almacen.todos('tutorias').filter((t) => t.docenteId === usuario.id);
+  return `
+    ${encabezadoInicio(usuario, almacen)}
+    <section class="grid kpis">
+      ${kpi('Estudiantes a cargo', visibles.length)}
+      ${kpi('Por aprobar', pendientes.length)}
+      ${kpi('En riesgo (promedio menor a 4,0)', enRiesgo.length)}
+      ${kpi('Mis tutorías', misTutorias.length)}
+    </section>
+    <section class="grid dos" style="margin-top:var(--gutter)">
+      <div class="tarjeta"><h2>Recursos por aprobar</h2>${pendientes.length
+        ? pendientes.map((r) => `<div class="fila-simple"><span>${esc(r.titulo)}</span>${badge(r.tipo)}</div>`).join('')
+        : vacio('No hay recursos esperando aprobación.')}</div>
+      <div class="tarjeta"><h2>Estudiantes que necesitan apoyo</h2>${enRiesgo.length
+        ? enRiesgo.map((x) => `<div class="fila-simple"><span>${esc(x.e.nombre)}</span><span class="badge peligro">${formatoNota(x.prom)}</span></div>`).join('')
+        : vacio('Ningún estudiante está bajo el umbral.')}</div>
+      <div class="tarjeta"><h2>Próximas tutorías</h2>${bloqueTutorias(almacen, usuario)}</div>
+      <div class="tarjeta"><h2>Actividad reciente</h2>${listaActividad(actividadReciente(almacen, usuario, visibles))}</div>
+    </section>`;
+}
+
+function inicioDirectivo(ctx) {
+  const { usuario, almacen } = ctx;
+  const visibles = estudiantesVisibles(usuario, almacen);
+  const notas = almacen.todos('resultados').filter((r) => visibles.some((e) => e.id === r.estudianteId));
+  const prom = promedioDe(notas.map((n) => ({ nota: n.nota })));
+  const asistencias = almacen.todos('asistencias').filter((a) => visibles.some((e) => e.id === a.estudianteId));
+  const pct = asistencias.length ? Math.round((asistencias.filter((a) => a.presente).length / asistencias.length) * 100) : null;
+  const asignaturas = almacen.todos('asignaturas');
+  const porAsignatura = asignaturas.map((a) => {
+    const lista = notas.filter((n) => n.asignaturaId === a.id);
+    return { nombre: a.nombre, prom: promedioDe(lista.map((n) => ({ nota: n.nota }))) };
+  }).filter((x) => x.prom !== null);
+  const enRiesgo = visibles.filter((e) => {
+    const p = promedioDe(notasDe(almacen, e.id));
+    return p !== null && p < LIMITE_RIESGO;
+  });
+  return `
+    ${encabezadoInicio(usuario, almacen)}
+    <section class="grid kpis">
+      ${kpi('Estudiantes', visibles.length)}
+      ${kpi('Promedio general', formatoNota(prom))}
+      ${kpi('Asistencia general', pct === null ? '—' : pct + '%')}
+      ${kpi('En riesgo', enRiesgo.length)}
+    </section>
+    <section class="grid dos" style="margin-top:var(--gutter)">
+      <div class="tarjeta"><h2>Rendimiento por asignatura</h2>${porAsignatura.length
+        ? porAsignatura.map((x) => `<div class="fila-simple"><span>${esc(x.nombre)}</span><span class="badge ${x.prom < LIMITE_RIESGO ? 'peligro' : 'ok'}">${formatoNota(x.prom)}</span></div>`).join('')
+        : vacio('Todavía no hay notas.')}</div>
+      <div class="tarjeta"><h2>Próximas tutorías</h2>${bloqueTutorias(almacen, usuario)}</div>
+      <div class="tarjeta"><h2>Estudiantes que necesitan apoyo</h2>${enRiesgo.length
+        ? enRiesgo.map((e) => `<div class="fila-simple"><span>${esc(e.nombre)}</span><span class="badge peligro">${formatoNota(promedioDe(notasDe(almacen, e.id)))}</span></div>`).join('')
+        : vacio('Ningún estudiante está bajo el umbral.')}</div>
+      <div class="tarjeta"><h2>Actividad reciente</h2>${listaActividad(actividadReciente(almacen, usuario, visibles))}</div>
+    </section>`;
+}
+
+export function vistaInicio(ctx) {
+  const { usuario } = ctx;
+  switch (usuario.rol) {
+    case 'estudiante': return inicioEstudiante(ctx);
+    case 'apoderado': return inicioApoderado(ctx);
+    case 'docente': return inicioDocente(ctx);
+    case 'directivo': return inicioDirectivo(ctx);
+    default: return vacio('Sin contenido para este rol.');
+  }
 }
 
 // ---------- Biblioteca ----------

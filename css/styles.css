@@ -526,3 +526,17 @@ article.tarjeta:hover, .tarjeta.kpi:hover {
 .login .demo-item small { color: #5b6478; }
 .login .demo-item { background: #ffffff; border-color: #e2e7f0; color: #1d2433; }
 .login .demo-item:hover { background: #f5f7fb; }
+
+/* ================= Contenido del inicio por rol ================= */
+.fila-simple {
+  display: flex; justify-content: space-between; align-items: center; gap: .75rem;
+  padding: .6rem 0; border-bottom: 1px solid var(--borde);
+}
+.fila-simple:last-child { border-bottom: none; }
+.lista-actividad { list-style: none; margin: 0; padding: 0; display: grid; gap: .7rem; }
+.lista-actividad li { display: flex; gap: .65rem; align-items: flex-start; }
+.punto-act {
+  width: 9px; height: 9px; border-radius: 50%; margin-top: .45rem; flex: 0 0 9px;
+  background: var(--grad);
+}
+.tarjeta h2 { font-size: 1.05rem; }
