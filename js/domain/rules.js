@@ -1,4 +1,4 @@
-// Motor de recomendaciones por reglas (no es IA que aprende).
+// Motor de recomendaciones por reglas.
 // Una regla aprobada por un docente se activa cuando la última nota de un estudiante
 // en la asignatura de la regla queda por debajo del umbral.
 

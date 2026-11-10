@@ -32,7 +32,7 @@ Para probar el modo sin conexión, usa el botón **Simular sin conexión** en la
 | 5 funcionalidades obligatorias | Biblioteca, Tutorías, Seguimiento, Recomendaciones, Informes |
 | 4 roles con permisos (RBAC) | `js/core/rbac.js` |
 | Inicio de sesión con diferencia de rol | `js/core/auth.js`, `js/app.js` |
-| Recomendaciones basadas en reglas y recursos aprobados por docentes (no IA) | `js/domain/rules.js` |
+| Recomendaciones basadas en reglas y recursos aprobados por docentes | `js/domain/rules.js` |
 | Uso con baja conectividad | `sw.js`, `js/core/sync.js` |
 | Datos de menores protegidos | Contraseñas con PBKDF2 y sal; ningún dato sale del navegador en esta versión |
 

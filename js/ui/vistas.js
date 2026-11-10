@@ -297,7 +297,7 @@ export function vistaRecomendaciones(ctx) {
   const generar = usuario.rol === 'docente' ? `
     <div class="tarjeta" style="margin-bottom:var(--gutter)">
       <h2>Generar recomendaciones</h2>
-      <p class="suave">Aplica las reglas aprobadas a las notas de cada estudiante. No es IA: solo compara notas con umbrales.</p>
+      <p class="suave">Aplica las reglas aprobadas a las notas de cada estudiante. Compara cada nota con su umbral.</p>
       <div class="acciones">
         ${visibles.map((e) => `<button data-action="generarRecomendaciones" data-id="${esc(e.id)}">${esc(e.nombre)}</button>`).join('')}
       </div>
