@@ -512,3 +512,15 @@ article.tarjeta:hover, .tarjeta.kpi:hover {
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .login { background: #0f1420 url("../assets/fondo-login.svg") center / cover no-repeat fixed; }
 }
+
+/* La pantalla de inicio usa siempre paleta clara, para que el fondo y el texto se lean bien. */
+.login {
+  color-scheme: light;
+  color: #1d2433;
+}
+.login .tarjeta { background: #ffffff !important; color: #1d2433; }
+.login input { background: #ffffff; color: #1d2433; }
+.login .suave, .login-bajada, .login-lista li { color: #4a5368; }
+.login-marca h1 { color: transparent; }
+.login .demo-item strong { color: #1d2433; }
+.login .demo-item small { color: #5b6478; }
