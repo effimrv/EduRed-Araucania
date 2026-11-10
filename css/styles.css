@@ -277,3 +277,184 @@ th { color: var(--texto-suave); font-weight: 600; font-size: .8rem; text-transfo
   padding: 4px;
 }
 .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* ================= Tema visual ================= */
+
+:root {
+  --grad: linear-gradient(135deg, #2d6cdf 0%, #7b5cff 55%, #e255b8 100%);
+  --grad-suave: linear-gradient(135deg, rgba(45,108,223,.12), rgba(123,92,255,.12) 60%, rgba(226,85,184,.12));
+  --acento-1: #2d6cdf;
+  --acento-2: #7b5cff;
+  --acento-3: #e255b8;
+  --acento-4: #17b8a6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --grad-suave: linear-gradient(135deg, rgba(107,156,255,.18), rgba(123,92,255,.18) 60%, rgba(226,85,184,.18));
+  }
+}
+
+body {
+  background:
+    radial-gradient(900px 500px at 100% -10%, rgba(123,92,255,.10), transparent 60%),
+    radial-gradient(800px 500px at -10% 110%, rgba(23,184,166,.10), transparent 60%),
+    var(--bg);
+}
+
+/* Login */
+.login {
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+}
+.login::before, .login::after {
+  content: "";
+  position: absolute;
+  width: 520px; height: 520px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: .45;
+  z-index: -1;
+  animation: flotar 14s ease-in-out infinite alternate;
+}
+.login::before { background: var(--acento-2); top: -180px; left: -140px; }
+.login::after { background: var(--acento-4); bottom: -200px; right: -120px; animation-delay: -6s; }
+@keyframes flotar {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(60px, 40px) scale(1.12); }
+}
+.login-marca h1 {
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -.02em;
+}
+.login-marca .logo {
+  width: 84px; height: 84px; border-radius: 24px;
+  box-shadow: 0 18px 40px rgba(123,92,255,.35);
+}
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+.chip {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .4rem .8rem; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--borde);
+  font-size: .85rem; font-weight: 600; box-shadow: var(--sombra);
+}
+.login .tarjeta {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--borde) 70%, transparent);
+  box-shadow: 0 30px 70px rgba(16,24,40,.14);
+}
+.cuenta {
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.cuenta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(123,92,255,.18);
+  border-color: var(--acento-2);
+}
+.cuenta .flecha {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--grad); color: #fff;
+}
+
+/* Botones */
+button.primario {
+  background: var(--grad);
+  border: none;
+  box-shadow: 0 8px 20px rgba(123,92,255,.30);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+button.primario:hover { filter: brightness(1.05); box-shadow: 0 12px 26px rgba(123,92,255,.38); }
+button:not(.primario):not(.fantasma):hover { transform: translateY(-1px); }
+
+/* Barra lateral */
+.barra-lateral {
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(10px);
+}
+.marca { font-size: 1.1rem; letter-spacing: -.01em; }
+.marca .logo { width: 42px; height: 42px; border-radius: 14px; box-shadow: 0 8px 18px rgba(123,92,255,.25); }
+.nav a { transition: background .15s ease, transform .15s ease; }
+.nav a:hover { transform: translateX(3px); }
+.nav a[aria-current="page"] {
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(123,92,255,.28);
+}
+.nav a[aria-current="page"] .icono { color: #fff; }
+
+/* Tarjetas */
+.tarjeta {
+  border-radius: 18px;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+article.tarjeta:hover, .tarjeta.kpi:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(16,24,40,.10);
+  border-color: color-mix(in srgb, var(--acento-2) 40%, var(--borde));
+}
+.kpi { position: relative; overflow: hidden; }
+.kpi::after {
+  content: ""; position: absolute; right: -30px; top: -30px;
+  width: 110px; height: 110px; border-radius: 50%;
+  background: var(--grad); opacity: .12;
+}
+.kpi:nth-child(1) .valor { color: var(--acento-1); }
+.kpi:nth-child(2) .valor { color: var(--acento-3); }
+.kpi:nth-child(3) .valor { color: var(--acento-4); }
+.kpi:nth-child(4) .valor { color: var(--acento-2); }
+.kpi:nth-child(5) .valor { color: #e8930c; }
+.kpi .valor { font-size: 2rem; letter-spacing: -.02em; }
+
+/* Banner de inicio */
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 28px 28px 26px;
+  margin-bottom: var(--gutter);
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 20px 50px rgba(123,92,255,.30);
+}
+.hero::after {
+  content: ""; position: absolute; right: -60px; bottom: -80px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: rgba(255,255,255,.14);
+}
+.hero h1 { color: #fff; font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin-bottom: .3rem; }
+.hero p { color: rgba(255,255,255,.9); max-width: 620px; margin: 0; }
+.hero .chip { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.3); color: #fff; box-shadow: none; }
+.hero .chips { margin-top: 1rem; }
+
+/* Badges con color */
+.badge.primario { background: var(--primario-suave); }
+.badge.ok { box-shadow: inset 0 0 0 1px rgba(31,157,104,.25); }
+
+/* Encabezados de vista */
+.encabezado-vista h1 {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+/* Entrada suave de las vistas */
+#vista > * { animation: subir .35s ease both; }
+#vista > *:nth-child(2) { animation-delay: .05s; }
+#vista > *:nth-child(3) { animation-delay: .1s; }
+@keyframes subir {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login::before, .login::after, #vista > * { animation: none !important; }
+}

@@ -72,7 +72,14 @@ export function vistaInicio(ctx) {
   }[usuario.rol];
 
   return `
-    ${encabezado(`Hola, ${usuario.nombre.split(' ')[0]}`, bienvenida)}
+    <section class="hero">
+      <h1>Hola, ${esc(usuario.nombre.split(' ')[0])}</h1>
+      <p>${esc(bienvenida)}</p>
+      <div class="chips">
+        ${badge(usuario.rol, '')}
+        ${badge(almacen.buscar('establecimientos', usuario.establecimientoId)?.nombre ?? '—', '')}
+      </div>
+    </section>
     <section class="grid kpis" aria-label="Indicadores">
       ${kpi('Recursos aprobados', recursosAprobados)}
       ${usuario.rol === 'docente' ? kpi('Pendientes de aprobar', pendientes) : ''}

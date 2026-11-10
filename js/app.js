@@ -58,6 +58,7 @@ function vistaLogin() {
         </div>
         <div class="tarjeta">
           <h2>Ingresar</h2>
+          <div class="chips"><span class="chip">📱 Funciona sin internet</span><span class="chip">🔐 Acceso por rol</span><span class="chip">📚 5 módulos</span></div>
           <form data-form="login">
             <label>Correo<input name="correo" type="email" autocomplete="username" required></label>
             <label>Contraseña<input name="password" type="password" autocomplete="current-password" required></label>
@@ -68,7 +69,7 @@ function vistaLogin() {
             ${cuentas.map(([correo, rol, detalle]) => `
               <button class="cuenta" data-action="cuentaDemo" data-correo="${esc(correo)}">
                 <span><strong>${esc(rol)}</strong><small>${esc(detalle)}</small></span>
-                <span aria-hidden="true">→</span>
+                <span class="flecha" aria-hidden="true">→</span>
               </button>`).join('')}
           </div>
         </div>
