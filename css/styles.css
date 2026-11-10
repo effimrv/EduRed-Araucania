@@ -268,3 +268,12 @@ th { color: var(--texto-suave); font-weight: 600; font-size: .8rem; text-transfo
 }
 
 [hidden] { display: none !important; }
+
+/* Logo: la imagen tiene fondo blanco, así que el contenedor también es claro. */
+.logo {
+  background: #ffffff !important;
+  border: 1px solid var(--borde);
+  overflow: hidden;
+  padding: 4px;
+}
+.logo img { width: 100%; height: 100%; object-fit: contain; display: block; }

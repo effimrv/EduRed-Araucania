@@ -1,7 +1,7 @@
 // Service Worker: deja la aplicación disponible sin conexión (caché de la capa de interfaz).
 const VERSION = 'edured-v2';
 const SHELL = [
-  './', './index.html', './manifest.webmanifest', './css/styles.css', './assets/icon.svg',
+  './', './index.html', './manifest.webmanifest', './css/styles.css', './assets/logo.png',
   './js/app.js', './js/core/auth.js', './js/core/rbac.js', './js/core/repository.js', './js/core/sync.js',
   './js/domain/models.js', './js/domain/rules.js', './js/domain/reports.js', './js/domain/servicios.js',
   './js/data/seed.js', './js/ui/componentes.js', './js/ui/vistas.js',

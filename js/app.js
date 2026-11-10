@@ -51,7 +51,7 @@ function vistaLogin() {
     <section class="login">
       <div class="login-caja">
         <div class="login-marca">
-          <div class="logo">ER</div>
+          <div class="logo"><img src="assets/logo.png" alt="Logo de EduRed"></div>
           <h1>EduRed Araucanía</h1>
           <p class="suave">Plataforma de apoyo educativo para escuelas públicas del SLEP Araucanía. Funciona aunque no haya internet.</p>
           <p class="suave">Cuentas de demostración con la contraseña <code>${esc(PASSWORD_DEMO)}</code>.</p>
@@ -109,7 +109,7 @@ function shell(contenidoHtml) {
   app.innerHTML = `
     <div class="shell">
       <aside class="barra-lateral" aria-label="Navegación principal">
-        <div class="marca"><div class="logo">ER</div><span>EduRed</span></div>
+        <div class="marca"><div class="logo"><img src="assets/logo.png" alt="Logo de EduRed"></div><span>EduRed</span></div>
         <nav class="nav">${navegacion()}</nav>
         <div style="margin-top:auto" class="suave">
           <div><strong>${esc(u.nombre)}</strong></div>
